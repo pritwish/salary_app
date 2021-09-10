@@ -1,6 +1,6 @@
-# Project Name
+# Book Logger
 
-Write a small description of your project
+
 
 
 > This project was built as a part ot [PythonToProject Bootcamp by TheLearningDev](https://bhavaniravi.gumroad.com/l/LaFSj)
@@ -24,14 +24,15 @@ List all the APIs it's methods, request and response params
 
 ## Coding Issues and Learning
 
+KeyError: 'DATABASE_URL'
 
 ## Deployment Instructions
 
 
+
 ## Repo Setup
 
-> Add How to setup and run your app
-> This is what you will use to deploy your app, so create a seperate requirements.txt file here
+
 
 
 
