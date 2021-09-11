@@ -63,7 +63,7 @@ book_to_category = db.Table('book_to_category',
 
 class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    password = db.Column(db.String(1200))
+    name = db.Column(db.String(1200))
     author = db.relationship('Author', secondary=book_to_author, lazy='subquery', backref=db.backref('author', lazy=True))
     published_date = db.Column(db.Date)
     category = db.relationship('Category', secondary=book_to_category, lazy='subquery', backref=db.backref('category', lazy=True))
