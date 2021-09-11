@@ -76,3 +76,34 @@ def get_book_list():
 def get_book_by_id(id):
     book = Book.query.get(id)
     return {"id": book.id, "name": book.name, "published_date": book.published_date, "author": book.author}
+
+
+@app.route("/book/<int:book_id>/note", methods=["POST"])
+def add_note(book_id):
+    book = Book.query.get(book_id)
+    if not book:
+        return {"status": "Error"}, 401
+
+    params = request.json
+    note = Notes(note=params["note"], book=book_id, created_by=1)
+    db.session.add(note)
+    db.session.commit()
+    return {"id": note.id, "note": note.note, "created_at": note.created_at}
+    
+
+@app.route("/book/<int:book_id>/note", methods=["GET"])
+def get_all_notes(book_id):
+    notes = Notes.query.filter_by(book=book_id).all()
+    results = []
+
+    for note in notes:
+        results.append({"id": note.id, "note": note.note, "created_at": note.created_at})
+
+    return {"data": results}
+
+@app.route("/book/<int:book_id>/note/<int:note_id>", methods=["GET"])
+def get_note_by_id(book_id, note_id):
+    note = Notes.query.get(note_id)
+    return {"id": note.id, "note": note.note, "created_at": note.created_at}
+    
+

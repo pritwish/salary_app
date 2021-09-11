@@ -88,6 +88,7 @@ class Author(db.Model):
 class Notes(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     book = db.Column(db.Integer, db.ForeignKey('book.id'), nullable=False)
+    note = db.Column(db.String)
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_at = db.Column(db.Date, default=date.today())
 
