@@ -37,9 +37,26 @@ def add_book():
     # name, author, pages
     params = request.json
     book = Book(name=params["book_name"])
+    category_ids = params.get("categories", [])
+    for c_id in category_ids:
+        category = Category.query.get(c_id)
+        if category:
+            book.category.append(category)
+
+    author_ids = params.get("author_ids", [])
+    for a_id in author_ids:
+        author = Author.query.get(a_id)
+        if author:
+            book.author.append(author)
+
+
     db.session.add(book)
     db.session.commit()
-    return {"id": book.id, "name": book.name, "published_date": book.published_date, "author": book.author}
+
+
+    return {"id": book.id, "name": book.name, "published_date": book.published_date, 
+            "author": [author.id for author in book.author], 
+            "category": [category.id for category in book.category]}
 
 @app.route("/book/<int:id>", methods=["PUT"])
 def update_book(id):
@@ -107,3 +124,41 @@ def get_note_by_id(book_id, note_id):
     return {"id": note.id, "note": note.note, "created_at": note.created_at}
     
 
+@app.route("/author", methods=["POST"])
+def add_author():
+    # name, author, pages
+    params = request.json
+    author = Author(author_name=params["name"], author_bio=params.get("bio"))
+    db.session.add(author)
+    db.session.commit()
+    return {"id": author.id, "name": author.author_name, "bio": author.author_bio}
+
+@app.route("/category", methods=["POST"])
+def add_category():
+    # name, author, pages
+    params = request.json
+    category = Category(name=params["name"])
+    db.session.add(category)
+    db.session.commit()
+    return {"id": category.id, "name": category.name}
+
+
+@app.route("/author",  methods=["GET"])
+def get_author_list():
+    authors = Author.query.filter_by().all()
+
+    results = []
+    for author in authors:
+        results.append({"id": author.id, "name": author.author_name, "bio": author.author_bio})
+
+    return {"data": results}
+
+@app.route("/category",  methods=["GET"])
+def get_category_list():
+    categories = Category.query.filter_by().all()
+
+    results = []
+    for category in categories:
+        results.append({"id": category.id, "name": category.name})
+
+    return {"data": results}
