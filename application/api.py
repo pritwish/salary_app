@@ -1,12 +1,37 @@
 from application.app import app, db
 from flask import request
-
+import sqlalchemy
 # Import your models here
 from application.models import User, Book, Author, Notes, Category
 
+from flask_jwt import jwt_required, JWT, current_identity
+
+def identity(payload):
+    user_id = payload['identity']
+    return User.query.filter_by(id=user_id).first()
+
+def authenticate(username, password):
+    user = User.query.filter_by(username=username).first()
+    if user and user.password == password:
+        return user
+
+jwt = JWT(app, authenticate, identity)
+
+@app.route("/signup", methods=["POST"])
+def signup():
+    params = request.json
+    try:
+        user = User(**params)
+        db.session.add(user)
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError:
+        return {"Status": "Error", "result": "User already exists"}, 400
+    return {"Status": "Success", "result": "User created"}
+
 @app.route("/")
+@jwt_required()
 def home():
-    return {"Status": "Success"}, 200 
+    return {"Status": "Success", "username": current_identity.username}, 200 
 
 # Write your API endpoints here
 
@@ -96,16 +121,17 @@ def get_book_by_id(id):
 
 
 @app.route("/book/<int:book_id>/note", methods=["POST"])
+@jwt_required()
 def add_note(book_id):
     book = Book.query.get(book_id)
     if not book:
         return {"status": "Error"}, 401
 
     params = request.json
-    note = Notes(note=params["note"], book=book_id, created_by=1)
+    note = Notes(note=params["note"], book=book_id, created_by=current_identity.id)
     db.session.add(note)
     db.session.commit()
-    return {"id": note.id, "note": note.note, "created_at": note.created_at}
+    return {"id": note.id, "note": note.note, "created_at": note.created_at, "created_by": note.created_by}
     
 
 @app.route("/book/<int:book_id>/note", methods=["GET"])
