@@ -1,96 +1,77 @@
 from application.app import app, db
 from datetime import date
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    password = db.Column(db.String(120))
+# class User(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     username = db.Column(db.String(80), unique=True, nullable=False)
+#     password = db.Column(db.String(120))
 
 
-# Table 1 : Book
-# - id : int (Primary Key)
-# - book_name : string 
-# - author : Relationship(M2M)
-# - published_date : Date
-# - Category : list of strings
-# - Price : float
-# - publisher : Relationship(1:1)
+# Table 1: salary
+# - salary_id - int (Primary key)
+# - salary : int
+# - salary_currency : string
+# - company : Relationship(M2M)
+# - designation : Relationship(M2M)
+# - YoE : int
+# - number_of_data : Relationship(1:1)
 
-# M-M
-# Book - Author 
-# B1 - A1, A2
-# B2 - A2, A3
-# B3 - A1, A3
-
-# M-M
-# Book - Category 
-# B1 - C1, C3
-# B2 - C2, C1
-# B3 - C3, C1
-
-# Book
-# B1
-# B2 
-# B3
-
-# Author
-# A1
-# A2
-# A3
-
-# Book-Author
-# B1 A1
-# B1 A2
-# B2 A2
-# B3 A3
-# B3 A1
-# B3 A3
-
-book_to_author = db.Table('book_to_author',
-    db.Column('book_id', db.Integer, db.ForeignKey('book.id'), primary_key=True),
-    db.Column('author_id', db.Integer, db.ForeignKey('author.id'), primary_key=True)
+salary_to_company = db.Table('salary_to_company',
+    db.Column('salary_id', db.Integer, db.ForeignKey('salary.id'), primary_key=True),
+    db.Column('company_id', db.Integer, db.ForeignKey('company.id'), primary_key=True)
 )
 
-class Category(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(1200))
-
-
-book_to_category = db.Table('book_to_category',
-    db.Column('book_id', db.Integer, db.ForeignKey('book.id'), primary_key=True),
-    db.Column('category_id', db.Integer, db.ForeignKey('category.id'), primary_key=True)
+salary_to_designation = db.Table('salary_to_designation',
+    db.Column('salary_id', db.Integer, db.ForeignKey('salary.id'), primary_key=True),
+    db.Column('designation_id', db.Integer, db.ForeignKey('designation.id'), primary_key=True)
 )
 
-class Book(db.Model):
+class Salary(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(1200))
-    author = db.relationship('Author', secondary=book_to_author, lazy='subquery', backref=db.backref('author', lazy=True))
-    published_date = db.Column(db.Date)
-    category = db.relationship('Category', secondary=book_to_category, lazy='subquery', backref=db.backref('category', lazy=True))
-    price = db.Column(db.Integer)
+    salary = db.Column(db.Integer, nullable=True)
+    salary_currency = db.Column(db.String(50))
+    company = db.relationship('Company', secondary= salary_to_company, lazy='subquery', backref=db.backref('salary', lazy=True))
+    designation = db.relationship('Designation', secondary= salary_to_designation, lazy='subquery', backref=db.backref('salary', lazy=True))
+    YoE = db.Column(db.Integer, nullable=True)
+    # number_of_data = 
+    
 
 
-# Table 2 :Author
-# - author_id : int (Primary Key)
-# - author_name : string
-# - author_bio : string
+# Table 2 : Company
+# - company_id : int (Primary_key)
+# - company_name : string
+# - company_strength : int
 
-class Author(db.Model):
+class Company(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    author_name = db.Column(db.String(1200))
-    author_bio = db.Column(db.String(1200))
+    company_name = db.Column(db.String(500))
+    company_strength = db.Column(db.Integer)
 
-# Table 3 : Notes
-# - id : int (Primary Key)
-# - book : Book (ForeignKey) 1 book can have multiple notes
-# - user : Book (ForeigenKey) 1 user can have take multiple notes, for multiple books
 
-class Notes(db.Model):
+
+# Table 3: Designation
+# - designation_name : string
+# - designation_id : int (Primary key)
+
+class Designation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    book = db.Column(db.Integer, db.ForeignKey('book.id'), nullable=False)
-    note = db.Column(db.String)
-    created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    created_at = db.Column(db.Date, default=date.today())
+    designation_name = db.Column(db.Integer)
+
+# Table 4: datapoints
+# - number_of_datapoints : int
+# - datapoint_id : int (Primary key)
+# - Date - date
+class datapoints(db.Model):
+    no_data = db.Column(db.Integer)
+    id = db.Column(db.Integer, primary_key=True)
+
+# class Datapoints(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     number_of_datapoints = db.Column(db.Integer)
+#     date_entry = db.Column(db.Date, default=date.today())
+
+
+
 
 # Sample for One-many and Many-Many relationship
 # class WorkItem(db.Model):
